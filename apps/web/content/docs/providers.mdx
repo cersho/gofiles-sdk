@@ -17,6 +17,7 @@ The Go module currently includes these provider packages:
 | S3-compatible | `providers/s3compatible` | Generic endpoint, credentials, bucket, and region. |
 | DigitalOcean Spaces | `providers/digitaloceanspaces` | Spaces through the S3-compatible API. |
 | UploadThing | `providers/uploadthing` | Uses UploadThing UFS custom IDs as keys. |
+| Vercel Blob | `providers/vercelblob` | Uses Vercel Blob with OIDC or read-write token authentication. |
 
 ## Read provider metadata
 
@@ -50,6 +51,6 @@ func main() {
 
 ## Choose the right adapter
 
-Use `memory` for unit tests, `fs` for local development or single-node storage, and an S3-backed adapter for object storage. Use `s3compatible` when your provider exposes a custom S3 endpoint and does not have a dedicated adapter.
+Use `memory` for unit tests, `fs` for local development or single-node storage, and an S3-backed adapter for object storage. Use `s3compatible` when your provider exposes a custom S3 endpoint and does not have a dedicated adapter. Use `vercelblob` for projects already backed by Vercel Blob.
 
 Go to [Adapters](/adapters) for provider-specific setup.

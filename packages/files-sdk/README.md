@@ -1,12 +1,12 @@
 # Go Files SDK
 
-A unified Go API for object storage backends such as S3, Cloudflare R2, local files, memory storage, and UploadThing.
+A unified Go API for object storage backends such as S3, Cloudflare R2, Vercel Blob, local files, memory storage, and UploadThing.
 
 ## Highlights
 
 - **One client shape:** use the same methods for upload, download, list, copy, move, signed URLs, and deletes.
 - **Go-native I/O:** pass `io.Reader`, bytes, strings, or files through the `files.Body` helpers.
-- **Provider packages:** import only the backend you use, such as `providers/s3`, `providers/r2`, or `providers/fs`.
+- **Provider packages:** import only the backend you use, such as `providers/s3`, `providers/r2`, `providers/vercelblob`, or `providers/fs`.
 - **Normalized errors:** handle `*files.Error` codes instead of provider-specific error envelopes.
 - **Operational hooks:** observe actions, errors, retries, upload progress, and transfers without wrapping every call.
 

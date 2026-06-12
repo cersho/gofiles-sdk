@@ -9,6 +9,7 @@
     "r2",
     "s3-compatible",
     "digitalocean-spaces",
-    "uploadthing"
+    "uploadthing",
+    "vercel-blob"
   ]
 }
