@@ -1,0 +1,55 @@
+---
+title: Errors
+description: Use normalized Error values and ErrorCode constants to handle provider failures consistently.
+appliesTo: Go 1.26+
+---
+
+## Error codes
+
+```go
+const (
+	ErrNotFound     ErrorCode = "NotFound"
+	ErrUnauthorized ErrorCode = "Unauthorized"
+	ErrConflict     ErrorCode = "Conflict"
+	ErrReadOnly     ErrorCode = "ReadOnly"
+	ErrProvider     ErrorCode = "Provider"
+)
+```
+
+## Handle a missing key
+
+```go
+_, err := client.Download(ctx, "missing.txt", files.DownloadOptions{})
+if err != nil {
+	if files.IsCode(err, files.ErrNotFound) {
+		fmt.Println("file is missing")
+		return nil
+	}
+	return err
+}
+```
+
+## Inspect error details
+
+```go
+_, err := client.Head(ctx, "missing.txt", files.OperationOptions{})
+if err != nil {
+	var filesErr *files.Error
+	if errors.As(err, &filesErr) {
+		fmt.Println(filesErr.Code)
+		fmt.Println(filesErr.TimedOut)
+		fmt.Println(filesErr.Aborted)
+	}
+	return err
+}
+```
+
+## Create provider errors
+
+Adapter authors should wrap provider-specific failures in `files.Error`.
+
+```go
+return files.NewError(files.ErrProvider, "storage backend rejected the request", err)
+```
+
+Use `NewPermanentError` for errors that retries should not attempt again.

@@ -1,0 +1,78 @@
+---
+title: S3
+description: Connect to AWS S3 with AWS SDK v2 credentials, custom clients, public URLs, and signed URLs.
+appliesTo: Go 1.26+
+---
+
+## Create the adapter
+
+```go
+package main
+
+import (
+	"context"
+
+	files "github.com/cersho/gofiles-sdk/packages/files-sdk"
+	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/s3"
+)
+
+func newClient(ctx context.Context) (*files.Client, error) {
+	adapter, err := s3.New(ctx, s3.Options{
+		Bucket: "uploads",
+		Region: "us-east-1",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return files.New(files.Options{Adapter: adapter})
+}
+```
+
+## Credentials
+
+By default, the adapter uses the AWS SDK credential chain and region settings. These environment variables are commonly used:
+
+| Variable | Purpose |
+| --- | --- |
+| `AWS_REGION` | Bucket region. |
+| `AWS_DEFAULT_REGION` | Fallback bucket region. |
+| `AWS_ACCESS_KEY_ID` | Access key ID. |
+| `AWS_SECRET_ACCESS_KEY` | Secret access key. |
+| `AWS_SESSION_TOKEN` | Optional session token. |
+
+You can also pass static credentials:
+
+```go
+adapter, err := s3.New(ctx, s3.Options{
+	Bucket: "uploads",
+	Region: "us-east-1",
+	Credentials: &s3.Credentials{
+		AccessKeyID: os.Getenv("AWS_ACCESS_KEY_ID"),
+		SecretAccessKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
+	},
+})
+```
+
+## Signed URLs
+
+```go
+url, err := client.URL(ctx, "reports/q1.pdf", files.URLOptions{
+	ExpiresIn: 15 * time.Minute,
+})
+if err != nil {
+	return err
+}
+
+fmt.Println(url)
+```
+
+Use `PublicBaseURL` when reads should return a public CDN URL instead of a presigned URL.
+
+```go
+adapter, err := s3.New(ctx, s3.Options{
+	Bucket: "uploads",
+	Region: "us-east-1",
+	PublicBaseURL: "https://cdn.acme.internal",
+})
+```

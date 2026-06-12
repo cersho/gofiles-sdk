@@ -1,0 +1,71 @@
+---
+title: Bulk operations
+description: Use explicit bulk methods to upload, download, head, exists, and delete many keys with bounded concurrency.
+appliesTo: Go 1.26+
+---
+
+## Upload many files
+
+Bulk operations return successful items and per-key errors separately.
+
+```go
+result, err := client.UploadMany(ctx, []files.UploadManyItem{
+	{Key: "reports/january.txt", Body: files.StringBody("ready")},
+	{Key: "reports/february.txt", Body: files.StringBody("ready")},
+}, files.UploadManyOptions{
+	BulkOptions: files.BulkOptions{Concurrency: 2},
+})
+if err != nil {
+	return err
+}
+
+fmt.Println(len(result.Uploaded), len(result.Errors))
+// Output: 2 0
+```
+
+## Download many files
+
+```go
+result, err := client.DownloadMany(ctx, []string{
+	"reports/january.txt",
+	"reports/february.txt",
+}, files.DownloadManyOptions{
+	BulkOptions: files.BulkOptions{Concurrency: 2},
+})
+if err != nil {
+	return err
+}
+
+for _, stored := range result.Downloaded {
+	fmt.Println(stored.Key)
+}
+```
+
+## Stop on the first error
+
+Set `StopOnError` when the operation should stop scheduling work after the first failed key.
+
+```go
+result, err := client.DeleteMany(ctx, []string{
+	"reports/january.txt",
+	"reports/february.txt",
+}, files.DeleteManyOptions{
+	Concurrency: 1,
+	StopOnError: true,
+})
+if err != nil {
+	return err
+}
+
+fmt.Println(result.Deleted)
+```
+
+## Available methods
+
+- `UploadMany`
+- `DownloadMany`
+- `HeadMany`
+- `ExistsMany`
+- `DeleteMany`
+
+Single-key methods stay separate from bulk methods so Go call sites remain explicit.

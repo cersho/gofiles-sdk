@@ -1,0 +1,67 @@
+---
+title: Retries and timeouts
+description: Configure default and per-call retry and timeout behavior for storage operations.
+appliesTo: Go 1.26+
+---
+
+## Set client defaults
+
+`files.Options` accepts default timeout and retry settings. Each operation can override them with `OperationOptions`.
+
+```go
+client, err := files.New(files.Options{
+	Adapter: adapter,
+	Timeout: 5 * time.Second,
+	Retries: &files.RetryOptions{
+		Max: 3,
+		Backoff: func(ctx files.RetryBackoffContext) time.Duration {
+			return time.Duration(ctx.Attempt) * 250 * time.Millisecond
+		},
+	},
+})
+if err != nil {
+	return err
+}
+```
+
+## Override a single call
+
+```go
+stored, err := client.Head(ctx, "profiles/ada.txt", files.OperationOptions{
+	Timeout: 750 * time.Millisecond,
+	Retries: &files.RetryOptions{Max: 0},
+})
+if err != nil {
+	return err
+}
+
+fmt.Println(stored.Size)
+```
+
+## Retry body uploads safely
+
+The SDK retries uploads only when the body can be opened again. `StringBody`, `BytesBody`, and `FileBody` are replayable. `ReaderBody` is not replayable because it wraps a one-shot reader.
+
+```go
+_, err := client.Upload(ctx, "reports/q2.txt", files.StringBody("ready"), files.UploadOptions{
+	OperationOptions: files.OperationOptions{
+		Retries: &files.RetryOptions{Max: 2},
+	},
+})
+```
+
+## Detect timeout errors
+
+```go
+_, err := client.Download(ctx, "profiles/ada.txt", files.DownloadOptions{
+	OperationOptions: files.OperationOptions{Timeout: time.Nanosecond},
+})
+if err != nil {
+	var filesErr *files.Error
+	if errors.As(err, &filesErr) && filesErr.TimedOut {
+		fmt.Println("timed out")
+		return nil
+	}
+	return err
+}
+```

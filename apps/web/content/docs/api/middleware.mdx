@@ -1,0 +1,58 @@
+---
+title: Middleware
+description: Intercept operations before they reach the adapter to validate, transform, or observe requests.
+appliesTo: Go 1.26+
+---
+
+## Middleware shape
+
+Middleware receives an operation and the next handler.
+
+```go
+type Middleware func(context.Context, Operation, Handler) (any, error)
+```
+
+## Add validation
+
+The validation plugin rejects uploads, copies, moves, and signed upload URLs that do not meet your rules.
+
+```go
+maxSize := int64(5_000_000)
+
+client := files.MustNew(files.Options{
+	Adapter: memory.New(memory.Options{}),
+	Middleware: []files.Middleware{
+		validation.New(validation.Options{
+			MaxSize: &maxSize,
+			AllowedTypes: []string{"image/png", "image/jpeg"},
+		}),
+	},
+})
+
+_, err := client.Upload(ctx, "avatars/ada.png", files.BytesBody(pngBytes), files.UploadOptions{
+	ContentType: "image/png",
+})
+if err != nil {
+	return err
+}
+```
+
+## Intercept one operation kind
+
+Use `files.Handlers` to attach middleware to specific operation kinds.
+
+```go
+client := files.MustNew(files.Options{
+	Adapter: memory.New(memory.Options{}),
+	Middleware: []files.Middleware{
+		files.Handlers(map[files.OperationKind]files.Middleware{
+			files.OperationDelete: func(ctx context.Context, op files.Operation, next files.Handler) (any, error) {
+				fmt.Println("delete", op.Key)
+				return next(ctx, op)
+			},
+		}),
+	},
+})
+```
+
+Middleware runs before retries and provider dispatch, so it is the right place for request validation and policy checks.

@@ -1,0 +1,23 @@
+{
+  "name": "gofiles-sdk-monorepo",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.3.14",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "bun run go:build && bun run docs:build",
+    "test": "bun run go:test",
+    "go:download": "go -C packages/files-sdk mod download",
+    "go:fmt": "gofmt -w packages/files-sdk",
+    "go:fmt:check": "bun run scripts/check-go-format.mjs",
+    "go:build": "go -C packages/files-sdk build ./...",
+    "go:vet": "go -C packages/files-sdk vet ./...",
+    "go:test": "go -C packages/files-sdk test ./...",
+    "docs:build": "cd apps/web && bun run build",
+    "docs:dev": "cd apps/web && bun run dev",
+    "docs:types": "cd apps/web && bun run types"
+  }
+}

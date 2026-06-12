@@ -1,0 +1,63 @@
+---
+title: Memory
+description: Use in-memory storage for tests, examples, and short-lived workloads.
+appliesTo: Go 1.26+
+---
+
+## Create the adapter
+
+The memory adapter stores data inside the current process.
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+
+	files "github.com/cersho/gofiles-sdk/packages/files-sdk"
+	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/memory"
+)
+
+func main() {
+	ctx := context.Background()
+	client := files.MustNew(files.Options{
+		Adapter: memory.New(memory.Options{}),
+	})
+
+	_, err := client.Upload(ctx, "fixtures/readme.txt", files.StringBody("ready"), files.UploadOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	stored, err := client.Download(ctx, "fixtures/readme.txt", files.DownloadOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	text, err := stored.Text(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(text)
+	// Output: ready
+}
+```
+
+## Seed data
+
+```go
+adapter := memory.New(memory.Options{
+	Initial: map[string]memory.Seed{
+		"fixtures/profile.txt": {
+			Body: []byte("Ada"),
+			ContentType: "text/plain",
+		},
+	},
+})
+
+client := files.MustNew(files.Options{Adapter: adapter})
+```
+
+Memory storage supports range reads, metadata, cache control, delimiter listing, multipart uploads, resumable uploads, server-side copy, and memory URLs.

@@ -1,0 +1,56 @@
+---
+title: Hooks
+description: Observe actions, errors, and retries from one client-level configuration point.
+appliesTo: Go 1.26+
+---
+
+## Add hooks
+
+Hooks are fire-and-forget. A panic inside a hook is recovered and does not fail the storage operation.
+
+```go
+client := files.MustNew(files.Options{
+	Adapter: memory.New(memory.Options{}),
+	Hooks: files.Hooks{
+		OnAction: func(event files.ActionEvent) {
+			fmt.Println(event.Type, event.Status, event.Key)
+		},
+		OnError: func(event files.ErrorEvent) {
+			fmt.Println(event.Type, event.Error.Code)
+		},
+		OnRetry: func(event files.RetryEvent) {
+			fmt.Println(event.Type, event.Attempt, event.Delay)
+		},
+	},
+})
+```
+
+## Action events
+
+Action events fire when an operation succeeds or fails.
+
+```go
+_, err := client.Upload(ctx, "reports/q1.txt", files.StringBody("ready"), files.UploadOptions{})
+if err != nil {
+	return err
+}
+// OnAction receives Type: upload, Status: success, Key: reports/q1.txt.
+```
+
+## Retry events
+
+Retry events fire before each scheduled retry.
+
+```go
+client := files.MustNew(files.Options{
+	Adapter: adapter,
+	Retries: &files.RetryOptions{Max: 2},
+	Hooks: files.Hooks{
+		OnRetry: func(event files.RetryEvent) {
+			fmt.Println(event.Attempt, event.MaxRetries)
+		},
+	},
+})
+```
+
+Use hooks for logs, metrics, tracing, and audit records.

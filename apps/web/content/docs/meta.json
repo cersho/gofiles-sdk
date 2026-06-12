@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "---Getting Started---",
+    "overview",
+    "installation",
+    "usage",
+    "---Concepts---",
+    "providers",
+    "prefixes",
+    "retries-and-timeouts",
+    "readonly",
+    "bulk",
+    "resumable",
+    "transfer",
+    "---Reference---",
+    "api",
+    "adapters"
+  ]
+}

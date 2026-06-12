@@ -1,0 +1,64 @@
+---
+title: Resumable uploads
+description: Use UploadControl to pause, resume, and recover large uploads when the adapter supports resumable sessions.
+appliesTo: Go 1.26+
+---
+
+## Start a resumable upload
+
+Pass an `UploadControl` in `UploadOptions.Control`. The adapter must report `Capabilities().Resumable`.
+
+```go
+control := files.NewUploadControl()
+
+result, err := client.Upload(ctx, "videos/launch.mp4", files.FileBody("launch.mp4"), files.UploadOptions{
+	ContentType: "video/mp4",
+	Control: control,
+	Multipart: &files.MultipartOptions{
+		PartSize: 8 * 1024 * 1024,
+	},
+})
+if err != nil {
+	return err
+}
+
+fmt.Println(result.Key)
+```
+
+## Save and resume a session
+
+`UploadControl.Session()` returns the provider session after the upload begins. Store it in your database if you want to resume after a process restart.
+
+```go
+session, ok := control.Session()
+if ok {
+	fmt.Println(session.UploadID)
+}
+```
+
+Resume with `UploadControlFrom`:
+
+```go
+control := files.UploadControlFrom(savedSession)
+
+_, err := client.Upload(ctx, savedSession.Key, files.FileBody("launch.mp4"), files.UploadOptions{
+	Control: control,
+})
+if err != nil {
+	return err
+}
+```
+
+## Pause or abort
+
+```go
+control.Pause()
+fmt.Println(control.Status())
+// Output: paused
+
+if err := control.Abort(ctx); err != nil {
+	return err
+}
+```
+
+Adapters that do not support resumable uploads return a provider error when you pass `Control`.

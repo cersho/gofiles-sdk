@@ -1,0 +1,78 @@
+---
+title: Client
+description: Configure the unified storage client and call provider-independent file operations.
+appliesTo: Go 1.26+
+---
+
+## Options
+
+`files.Options` configures a `Client`.
+
+```go
+type Options struct {
+	Adapter    Adapter
+	Prefix     string
+	ReadOnly   bool
+	Timeout    time.Duration
+	Retries    *RetryOptions
+	Hooks      Hooks
+	Middleware []Middleware
+}
+```
+
+## Construct a client
+
+```go
+adapter := memory.New(memory.Options{})
+
+client, err := files.New(files.Options{
+	Adapter: adapter,
+	Prefix: "tenants/acme",
+	Timeout: 5 * time.Second,
+	Retries: &files.RetryOptions{Max: 2},
+})
+if err != nil {
+	return err
+}
+
+fmt.Println(client.Prefix())
+// Output: tenants/acme
+```
+
+## Read adapter metadata
+
+```go
+fmt.Println(client.Adapter().Name())
+fmt.Println(client.Capabilities().RangeRead)
+fmt.Printf("%T\n", client.Raw())
+```
+
+`Raw` returns the provider-native client or adapter data. For S3, it returns the AWS S3 client.
+
+## File handles
+
+`File` binds a key to a handle with the same operations.
+
+```go
+profile := client.File("profiles/ada.txt")
+
+_, err := profile.Upload(ctx, files.StringBody("Ada"), files.UploadOptions{})
+if err != nil {
+	return err
+}
+
+stored, err := profile.Download(ctx, files.DownloadOptions{})
+if err != nil {
+	return err
+}
+
+text, err := stored.Text(ctx)
+if err != nil {
+	return err
+}
+
+fmt.Println(text)
+// Output: Ada
+```
+
+The handle supports `Upload`, `Download`, `Head`, `Exists`, `Delete`, `URL`, `SignedUploadURL`, `CopyTo`, `CopyFrom`, `MoveTo`, and `MoveFrom`.

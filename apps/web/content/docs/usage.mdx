@@ -1,0 +1,185 @@
+---
+title: Usage
+description: Create a files.Client with an adapter, then call the same Go methods across storage providers.
+appliesTo: Go 1.26+
+---
+
+## Create a client
+
+The client takes one adapter. Use `files.New` when you want to handle configuration errors, or `files.MustNew` in tests and small setup programs.
+
+```go
+package main
+
+import (
+	"context"
+
+	files "github.com/cersho/gofiles-sdk/packages/files-sdk"
+	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/s3"
+)
+
+func newStorage(ctx context.Context) (*files.Client, error) {
+	adapter, err := s3.New(ctx, s3.Options{
+		Bucket: "uploads",
+		Region: "us-east-1",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return files.New(files.Options{Adapter: adapter})
+}
+```
+
+## Upload and download
+
+Bodies use helper constructors so the SDK can tell whether an upload can be retried.
+
+```go
+ctx := context.Background()
+client := files.MustNew(files.Options{
+	Adapter: memory.New(memory.Options{}),
+})
+
+_, err := client.Upload(ctx, "profiles/ada.txt", files.StringBody("Ada Lovelace"), files.UploadOptions{
+	ContentType: "text/plain",
+	Metadata: map[string]string{
+		"team": "research",
+	},
+})
+if err != nil {
+	return err
+}
+
+stored, err := client.Download(ctx, "profiles/ada.txt", files.DownloadOptions{})
+if err != nil {
+	return err
+}
+
+text, err := stored.Text(ctx)
+if err != nil {
+	return err
+}
+
+fmt.Println(text)
+// Output: Ada Lovelace
+```
+
+## Work with a file handle
+
+Use `client.File(key)` when several operations target the same key.
+
+```go
+avatar := client.File("avatars/ada.png")
+
+_, err := avatar.Upload(ctx, files.FileBody("ada.png"), files.UploadOptions{
+	ContentType: "image/png",
+})
+if err != nil {
+	return err
+}
+
+exists, err := avatar.Exists(ctx, files.OperationOptions{})
+if err != nil {
+	return err
+}
+
+fmt.Println(exists)
+// Output: true
+```
+
+## List keys
+
+`List` returns one page. `ListAll` walks every page and calls your callback for each item.
+
+```go
+page, err := client.List(ctx, files.ListOptions{
+	Prefix: "profiles/",
+	Limit: 50,
+})
+if err != nil {
+	return err
+}
+
+for _, item := range page.Items {
+	fmt.Println(item.Key)
+}
+```
+
+```go
+err := client.ListAll(ctx, files.ListOptions{Prefix: "profiles/"}, func(file files.StoredFile) error {
+	fmt.Println(file.Key)
+	return nil
+})
+if err != nil {
+	return err
+}
+```
+
+## Generate URLs
+
+`URL` returns a public URL when the adapter has a public base URL. Otherwise, providers with signing support return a signed read URL.
+
+```go
+url, err := client.URL(ctx, "profiles/ada.txt", files.URLOptions{
+	ExpiresIn: 10 * time.Minute,
+})
+if err != nil {
+	return err
+}
+
+fmt.Println(url)
+```
+
+Use `SignedUploadURL` when a browser or mobile app uploads directly to storage.
+
+```go
+maxSize := int64(25_000_000)
+upload, err := client.SignedUploadURL(ctx, "uploads/report.pdf", files.SignedUploadOptions{
+	ContentType: "application/pdf",
+	MaxSize: &maxSize,
+	ExpiresIn: 10 * time.Minute,
+})
+if err != nil {
+	return err
+}
+
+fmt.Println(upload.Method, upload.URL)
+```
+
+## Handle errors
+
+All public client methods return normalized `*files.Error` values.
+
+```go
+stored, err := client.Download(ctx, "missing.txt", files.DownloadOptions{})
+if err != nil {
+	if files.IsCode(err, files.ErrNotFound) {
+		fmt.Println("missing")
+		return nil
+	}
+	return err
+}
+
+fmt.Println(stored.Key)
+```
+
+## Add client defaults
+
+Set defaults on the client, then override them per call.
+
+```go
+client, err := files.New(files.Options{
+	Adapter: adapter,
+	Prefix: "tenants/acme",
+	Timeout: 5 * time.Second,
+	Retries: &files.RetryOptions{Max: 2},
+})
+if err != nil {
+	return err
+}
+
+_, err = client.Head(ctx, "profiles/ada.txt", files.OperationOptions{
+	Timeout: 1 * time.Second,
+})
+```

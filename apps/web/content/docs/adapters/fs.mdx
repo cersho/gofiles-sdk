@@ -1,0 +1,68 @@
+---
+title: Filesystem
+description: Store objects on disk for local development, tests, and single-node deployments.
+appliesTo: Go 1.26+
+---
+
+## Create the adapter
+
+`fs.New` requires a root directory. The adapter prevents keys from escaping that root.
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"path/filepath"
+
+	files "github.com/cersho/gofiles-sdk/packages/files-sdk"
+	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/fs"
+)
+
+func main() {
+	ctx := context.Background()
+	root, err := os.MkdirTemp("", "gofiles-*")
+	if err != nil {
+		panic(err)
+	}
+	defer os.RemoveAll(root)
+
+	adapter, err := fs.New(fs.Options{Root: root})
+	if err != nil {
+		panic(err)
+	}
+
+	client := files.MustNew(files.Options{Adapter: adapter})
+
+	_, err = client.Upload(ctx, "reports/q1.txt", files.StringBody("ready"), files.UploadOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	data, err := os.ReadFile(filepath.Join(root, "reports", "q1.txt"))
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(data))
+	// Output: ready
+}
+```
+
+## Public URLs
+
+Set `URLBaseURL` when files are served by your application or a static file server.
+
+```go
+adapter, err := fs.New(fs.Options{
+	Root: "/srv/app/uploads",
+	URLBaseURL: "https://cdn.acme.internal/uploads",
+})
+if err != nil {
+	return err
+}
+```
+
+The filesystem adapter stores metadata in sidecar JSON files next to objects.

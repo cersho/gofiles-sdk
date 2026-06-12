@@ -1,0 +1,75 @@
+---
+title: Bodies
+description: Upload bodies wrap bytes, strings, readers, files, or custom open functions.
+appliesTo: Go 1.26+
+---
+
+## Body helpers
+
+Use these constructors for uploads:
+
+| Helper | Use when |
+| --- | --- |
+| `BytesBody` | You already have a byte slice. |
+| `StringBody` | You upload text. |
+| `ReaderBody` | You have a one-shot `io.Reader`. |
+| `FileBody` | You upload a file from disk. |
+| `NewBodyFromReadCloser` | You need custom open, size, content type, or retry behavior. |
+
+## Replayable bodies
+
+Retries only apply to uploads when the body can be opened again.
+
+```go
+_, err := client.Upload(ctx, "notes/readme.txt", files.StringBody("ready"), files.UploadOptions{
+	OperationOptions: files.OperationOptions{
+		Retries: &files.RetryOptions{Max: 2},
+	},
+})
+if err != nil {
+	return err
+}
+```
+
+`ReaderBody` is not replayable:
+
+```go
+reader := strings.NewReader("streamed once")
+
+_, err := client.Upload(ctx, "streams/input.txt", files.ReaderBody(reader), files.UploadOptions{
+	ContentType: "text/plain",
+})
+if err != nil {
+	return err
+}
+```
+
+## Custom bodies
+
+Use `NewBodyFromReadCloser` when you want to control retry behavior and metadata.
+
+```go
+body := files.NewBodyFromReadCloser(
+	func(context.Context) (io.ReadCloser, error) {
+		return io.NopCloser(strings.NewReader("custom body")), nil
+	},
+	int64(len("custom body")),
+	true,
+	"text/plain",
+	true,
+)
+
+_, err := client.Upload(ctx, "notes/custom.txt", body, files.UploadOptions{})
+```
+
+## Upload progress
+
+Use `OnProgress` on `UploadOptions`.
+
+```go
+_, err := client.Upload(ctx, "reports/q1.txt", files.StringBody("ready"), files.UploadOptions{
+	OnProgress: func(progress files.UploadProgress) {
+		fmt.Println(progress.Loaded, progress.Total, progress.Known)
+	},
+})
+```

@@ -1,0 +1,55 @@
+---
+title: Providers
+description: Provider adapters connect the unified Go client to each storage backend.
+appliesTo: Go 1.26+
+---
+
+## Supported providers
+
+The Go module currently includes these provider packages:
+
+| Provider | Import path | Notes |
+| --- | --- | --- |
+| Memory | `providers/memory` | Process-local storage for tests and ephemeral workloads. |
+| Filesystem | `providers/fs` | Stores objects on disk and metadata in sidecar files. |
+| S3 | `providers/s3` | AWS S3 and S3-compatible stores through AWS SDK v2. |
+| Cloudflare R2 | `providers/r2` | Uses the R2 S3-compatible HTTP API. |
+| S3-compatible | `providers/s3compatible` | Generic endpoint, credentials, bucket, and region. |
+| DigitalOcean Spaces | `providers/digitaloceanspaces` | Spaces through the S3-compatible API. |
+| UploadThing | `providers/uploadthing` | Uses UploadThing UFS custom IDs as keys. |
+
+## Read provider metadata
+
+The root package exposes a provider catalog for tools, docs, and setup UIs.
+
+```go
+package main
+
+import (
+	"fmt"
+
+	files "github.com/cersho/gofiles-sdk/packages/files-sdk"
+)
+
+func main() {
+	provider, ok := files.GetProvider("r2")
+	if !ok {
+		panic("provider not found")
+	}
+
+	fmt.Println(provider.Name)
+	for _, envVar := range files.GetSecretEnvVars("r2") {
+		fmt.Println(envVar.Key)
+	}
+	// Output:
+	// Cloudflare R2
+	// R2_ACCESS_KEY_ID
+	// R2_SECRET_ACCESS_KEY
+}
+```
+
+## Choose the right adapter
+
+Use `memory` for unit tests, `fs` for local development or single-node storage, and an S3-backed adapter for object storage. Use `s3compatible` when your provider exposes a custom S3 endpoint and does not have a dedicated adapter.
+
+Go to [Adapters](/adapters) for provider-specific setup.

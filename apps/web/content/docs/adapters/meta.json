@@ -1,0 +1,14 @@
+{
+  "title": "Adapters",
+  "root": true,
+  "pages": [
+    "index",
+    "memory",
+    "fs",
+    "s3",
+    "r2",
+    "s3-compatible",
+    "digitalocean-spaces",
+    "uploadthing"
+  ]
+}

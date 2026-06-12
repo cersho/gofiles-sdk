@@ -1,0 +1,13 @@
+{
+  "title": "API",
+  "root": true,
+  "pages": [
+    "index",
+    "client",
+    "bodies",
+    "stored-file",
+    "errors",
+    "hooks",
+    "middleware"
+  ]
+}

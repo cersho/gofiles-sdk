@@ -1,0 +1,74 @@
+---
+title: API overview
+description: The public Go API centers on Client, Adapter, Body, StoredFile, Error, hooks, middleware, bulk methods, and transfer helpers.
+appliesTo: Go 1.26+
+---
+
+## Packages
+
+The root package is:
+
+```go
+import files "github.com/cersho/gofiles-sdk/packages/files-sdk"
+```
+
+Provider packages live under `providers`. Plugin packages live under `plugins`.
+
+```go
+import (
+	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/s3"
+	"github.com/cersho/gofiles-sdk/packages/files-sdk/plugins/validation"
+)
+```
+
+## Core types
+
+| Type | Purpose |
+| --- | --- |
+| `Client` | Unified storage client. |
+| `Options` | Client adapter, prefix, read-only mode, defaults, hooks, and middleware. |
+| `Adapter` | Provider interface implemented by adapters. |
+| `Body` | Upload body abstraction. |
+| `StoredFile` | Download, head, and list result. |
+| `Error` | Normalized SDK error. |
+| `Hooks` | Action, error, and retry callbacks. |
+| `Middleware` | Operation interception layer. |
+
+## Client methods
+
+```go
+type Client struct{}
+
+func New(opts Options) (*Client, error)
+func MustNew(opts Options) *Client
+
+func (c *Client) Upload(context.Context, string, Body, UploadOptions) (UploadResult, error)
+func (c *Client) Download(context.Context, string, DownloadOptions) (StoredFile, error)
+func (c *Client) Head(context.Context, string, OperationOptions) (StoredFile, error)
+func (c *Client) Exists(context.Context, string, OperationOptions) (bool, error)
+func (c *Client) Delete(context.Context, string, OperationOptions) error
+func (c *Client) Copy(context.Context, string, string, OperationOptions) error
+func (c *Client) Move(context.Context, string, string, OperationOptions) error
+func (c *Client) List(context.Context, ListOptions) (ListResult, error)
+func (c *Client) ListAll(context.Context, ListOptions, func(StoredFile) error) error
+func (c *Client) Search(context.Context, string, SearchOptions, func(StoredFile) error) error
+func (c *Client) URL(context.Context, string, URLOptions) (string, error)
+func (c *Client) SignedUploadURL(context.Context, string, SignedUploadOptions) (SignedUpload, error)
+```
+
+## Global helpers
+
+`Transfer` copies files from one client to another.
+
+```go
+result, err := files.Transfer(ctx, source, destination, files.TransferOptions{
+	Prefix: "reports/",
+})
+if err != nil {
+	return err
+}
+
+fmt.Println(result.Transferred)
+```
+
+Continue with [Client](/api/client) for constructor and method details.

@@ -1,0 +1,44 @@
+---
+title: Prefixes
+description: Scope all client operations under a key prefix without leaking that prefix into application code.
+appliesTo: Go 1.26+
+---
+
+## Add a prefix
+
+Pass `Prefix` to `files.New` to put every operation under a namespace. The client prepends the prefix before calling the adapter and strips it from returned keys.
+
+```go
+client := files.MustNew(files.Options{
+	Adapter: memory.New(memory.Options{}),
+	Prefix: "tenants/acme",
+})
+
+_, err := client.Upload(ctx, "reports/q1.txt", files.StringBody("ready"), files.UploadOptions{})
+if err != nil {
+	return err
+}
+
+page, err := client.List(ctx, files.ListOptions{Prefix: "reports/"})
+if err != nil {
+	return err
+}
+
+fmt.Println(page.Items[0].Key)
+// Output: reports/q1.txt
+```
+
+## Use prefixes for tenant boundaries
+
+Prefixes are useful when application code should only see keys inside one tenant or workspace.
+
+```go
+func tenantStorage(adapter files.Adapter, tenantID string) *files.Client {
+	return files.MustNew(files.Options{
+		Adapter: adapter,
+		Prefix: "tenants/" + tenantID,
+	})
+}
+```
+
+The prefix feature is not an authorization layer. Enforce tenant access before you create or expose a client.

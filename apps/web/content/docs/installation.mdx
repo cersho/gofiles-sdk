@@ -1,0 +1,77 @@
+---
+title: Installation
+description: Install the Go module and import the provider package for the storage backend you use.
+appliesTo: Go 1.26+
+---
+
+## Install the module
+
+Run `go get` from your application module:
+
+```bash
+go get github.com/cersho/gofiles-sdk/packages/files-sdk
+```
+
+The module requires Go 1.26 or newer.
+
+## Choose a provider
+
+Provider packages are part of the same module. Import only the adapter you need:
+
+```go
+import (
+	files "github.com/cersho/gofiles-sdk/packages/files-sdk"
+	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/s3"
+)
+```
+
+The AWS SDK dependency is already declared in `go.mod` for S3-backed adapters.
+
+## Verify the install
+
+Create a small program with the memory adapter:
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+
+	files "github.com/cersho/gofiles-sdk/packages/files-sdk"
+	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/memory"
+)
+
+func main() {
+	ctx := context.Background()
+	client := files.MustNew(files.Options{
+		Adapter: memory.New(memory.Options{}),
+	})
+
+	result, err := client.Upload(ctx, "checks/install.txt", files.StringBody("ok"), files.UploadOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(result.Key)
+	// Output: checks/install.txt
+}
+```
+
+Run it:
+
+```bash
+go run .
+```
+
+## Provider setup
+
+Use the provider pages for adapter-specific options and environment variables:
+
+- [Memory](/adapters/memory)
+- [Filesystem](/adapters/fs)
+- [S3](/adapters/s3)
+- [Cloudflare R2](/adapters/r2)
+- [S3-compatible](/adapters/s3-compatible)
+- [DigitalOcean Spaces](/adapters/digitalocean-spaces)
+- [UploadThing](/adapters/uploadthing)

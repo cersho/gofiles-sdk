@@ -1,0 +1,36 @@
+---
+title: Read-only clients
+description: Create a client view that allows reads but rejects write operations with ErrReadOnly.
+appliesTo: Go 1.26+
+---
+
+## Create a read-only client
+
+Set `ReadOnly` during construction or derive a read-only view from an existing client.
+
+```go
+client := files.MustNew(files.Options{
+	Adapter: memory.New(memory.Options{}),
+	ReadOnly: true,
+})
+
+_, err := client.Upload(ctx, "reports/q1.txt", files.StringBody("blocked"), files.UploadOptions{})
+fmt.Println(files.IsCode(err, files.ErrReadOnly))
+// Output: true
+```
+
+## Derive a locked view
+
+```go
+writer := files.MustNew(files.Options{
+	Adapter: memory.New(memory.Options{}),
+})
+
+reader := writer.ReadOnly()
+_, err := reader.URL(ctx, "reports/q1.txt", files.URLOptions{})
+if err != nil && !files.IsCode(err, files.ErrNotFound) {
+	return err
+}
+```
+
+Read-only clients allow `Download`, `Head`, `Exists`, `List`, `ListAll`, `Search`, and `URL`. They reject `Upload`, `Delete`, `Copy`, `Move`, and `SignedUploadURL`.

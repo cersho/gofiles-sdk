@@ -1,0 +1,68 @@
+---
+title: Transfer
+description: Copy objects between two Files clients with progress, optional overwrite checks, and key transforms.
+appliesTo: Go 1.26+
+---
+
+## Transfer between clients
+
+Use `files.Transfer` when the source and destination can be different providers.
+
+```go
+source := files.MustNew(files.Options{
+	Adapter: memory.New(memory.Options{}),
+})
+destination := files.MustNew(files.Options{
+	Adapter: memory.New(memory.Options{}),
+})
+
+_, err := source.Upload(ctx, "reports/q1.txt", files.StringBody("ready"), files.UploadOptions{})
+if err != nil {
+	return err
+}
+
+result, err := files.Transfer(ctx, source, destination, files.TransferOptions{
+	Prefix: "reports/",
+})
+if err != nil {
+	return err
+}
+
+fmt.Println(result.Transferred)
+// Output: [reports/q1.txt]
+```
+
+## Transform destination keys
+
+```go
+result, err := files.Transfer(ctx, source, destination, files.TransferOptions{
+	Prefix: "reports/",
+	TransformKey: func(key string) string {
+		return "archive/" + key
+	},
+})
+if err != nil {
+	return err
+}
+
+fmt.Println(result.Transferred)
+```
+
+## Skip existing keys
+
+Set `Overwrite` to `false` to keep destination objects.
+
+```go
+overwrite := false
+result, err := files.Transfer(ctx, source, destination, files.TransferOptions{
+	Overwrite: &overwrite,
+	OnProgress: func(progress files.TransferProgress) {
+		fmt.Println(progress.Done, progress.Total, progress.Key, progress.Status)
+	},
+})
+if err != nil {
+	return err
+}
+
+fmt.Println(result.Skipped)
+```

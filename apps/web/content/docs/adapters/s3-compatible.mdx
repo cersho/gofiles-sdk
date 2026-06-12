@@ -1,0 +1,59 @@
+---
+title: S3-compatible
+description: Configure a generic S3-compatible endpoint with explicit credentials and bucket settings.
+appliesTo: Go 1.26+
+---
+
+## Create the adapter
+
+Use `s3compatible.New` for providers with an S3 API and a custom endpoint.
+
+```go
+package main
+
+import (
+	"context"
+
+	files "github.com/cersho/gofiles-sdk/packages/files-sdk"
+	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/s3compatible"
+)
+
+func newClient(ctx context.Context) (*files.Client, error) {
+	adapter, err := s3compatible.New(ctx, s3compatible.Options{
+		Name: "minio",
+		Bucket: "uploads",
+		Region: "us-east-1",
+		Endpoint: "https://minio.storage.internal",
+		AccessKeyID: "minio-access-key",
+		SecretAccessKey: "minio-secret-key",
+		ForcePathStyle: true,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return files.New(files.Options{Adapter: adapter})
+}
+```
+
+## Environment variables
+
+When credentials are not passed in options, the adapter reads:
+
+| Variable | Purpose |
+| --- | --- |
+| `S3_COMPATIBLE_ACCESS_KEY_ID` | Access key ID. |
+| `S3_COMPATIBLE_SECRET_ACCESS_KEY` | Secret access key. |
+
+## Public URLs
+
+```go
+adapter, err := s3compatible.New(ctx, s3compatible.Options{
+	Name: "minio",
+	Bucket: "uploads",
+	Endpoint: "https://minio.storage.internal",
+	AccessKeyID: os.Getenv("S3_COMPATIBLE_ACCESS_KEY_ID"),
+	SecretAccessKey: os.Getenv("S3_COMPATIBLE_SECRET_ACCESS_KEY"),
+	PublicBaseURL: "https://cdn.acme.internal/uploads",
+})
+```

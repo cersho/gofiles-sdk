@@ -1,0 +1,52 @@
+---
+title: DigitalOcean Spaces
+description: Connect to DigitalOcean Spaces through the S3-compatible API.
+appliesTo: Go 1.26+
+---
+
+## Create the adapter
+
+```go
+package main
+
+import (
+	"context"
+	"os"
+
+	files "github.com/cersho/gofiles-sdk/packages/files-sdk"
+	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/digitaloceanspaces"
+)
+
+func newClient(ctx context.Context) (*files.Client, error) {
+	adapter, err := digitaloceanspaces.New(ctx, digitaloceanspaces.Options{
+		Bucket: "uploads",
+		Region: "nyc3",
+		AccessKeyID: os.Getenv("DO_SPACES_KEY"),
+		SecretAccessKey: os.Getenv("DO_SPACES_SECRET"),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return files.New(files.Options{Adapter: adapter})
+}
+```
+
+## Environment variables
+
+When credentials are not passed in options, the adapter reads:
+
+| Variable | Purpose |
+| --- | --- |
+| `DO_SPACES_KEY` | Spaces access key. |
+| `DO_SPACES_SECRET` | Spaces secret key. |
+
+## Endpoint defaults
+
+If `Endpoint` is empty, the adapter uses:
+
+```text
+https://<region>.digitaloceanspaces.com
+```
+
+Set `PublicBaseURL` when your Space is behind a custom CDN domain.

@@ -1,0 +1,58 @@
+---
+title: Overview
+description: Go Files SDK gives Go services one storage client for S3, R2, local files, memory storage, S3-compatible buckets, and UploadThing.
+appliesTo: Go 1.26+
+---
+
+## What is Go Files SDK?
+
+Go Files SDK is a storage library for Go applications that need one call shape across object storage providers. You create a `files.Client` with an adapter, then use the same methods for upload, download, metadata, listing, signed URLs, bulk operations, and transfers.
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+
+	files "github.com/cersho/gofiles-sdk/packages/files-sdk"
+	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/memory"
+)
+
+func main() {
+	ctx := context.Background()
+	client := files.MustNew(files.Options{
+		Adapter: memory.New(memory.Options{}),
+	})
+
+	_, err := client.Upload(ctx, "invoices/june.txt", files.StringBody("paid"), files.UploadOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	ok, err := client.Exists(ctx, "invoices/june.txt", files.OperationOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(ok)
+	// Output: true
+}
+```
+
+## Why use it?
+
+Every storage provider has a different client, request type, error model, and signing API. Go Files SDK keeps provider-specific code at the adapter boundary, so the rest of your service can stay focused on keys, bodies, metadata, and storage results.
+
+- **Unified methods:** `Upload`, `Download`, `Head`, `Exists`, `Delete`, `Copy`, `Move`, `List`, `ListAll`, `Search`, `URL`, and `SignedUploadURL`.
+- **Provider adapters:** use `providers/s3`, `providers/r2`, `providers/fs`, `providers/memory`, `providers/s3compatible`, `providers/digitaloceanspaces`, or `providers/uploadthing`.
+- **Go-native bodies:** use `StringBody`, `BytesBody`, `ReaderBody`, `FileBody`, or `NewBodyFromReadCloser`.
+- **Normalized errors:** catch `*files.Error` and branch on codes such as `NotFound`, `Unauthorized`, `Conflict`, `ReadOnly`, and `Provider`.
+- **Escape hatch:** call `client.Raw()` or adapter-specific methods when you need provider-native behavior.
+
+## Next steps
+
+- [Installation](/installation) - add the module and choose a provider.
+- [Usage](/usage) - create a client and call the core methods.
+- [Adapters](/adapters) - configure each supported backend.
+- [API](/api) - read the public Go surface.

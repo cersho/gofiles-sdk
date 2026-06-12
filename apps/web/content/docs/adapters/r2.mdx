@@ -1,0 +1,60 @@
+---
+title: Cloudflare R2
+description: Connect to Cloudflare R2 through its S3-compatible HTTP API.
+appliesTo: Go 1.26+
+---
+
+## Create the adapter
+
+```go
+package main
+
+import (
+	"context"
+	"os"
+
+	files "github.com/cersho/gofiles-sdk/packages/files-sdk"
+	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/r2"
+)
+
+func newClient(ctx context.Context) (*files.Client, error) {
+	adapter, err := r2.New(ctx, r2.Options{
+		Bucket: "uploads",
+		AccountID: os.Getenv("R2_ACCOUNT_ID"),
+		AccessKeyID: os.Getenv("R2_ACCESS_KEY_ID"),
+		SecretAccessKey: os.Getenv("R2_SECRET_ACCESS_KEY"),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return files.New(files.Options{Adapter: adapter})
+}
+```
+
+## Environment variables
+
+You can pass credentials directly or use environment variables.
+
+| Variable | Purpose |
+| --- | --- |
+| `R2_ACCOUNT_ID` | Cloudflare account ID. |
+| `R2_ACCESS_KEY_ID` | R2 access key ID. |
+| `R2_SECRET_ACCESS_KEY` | R2 secret access key. |
+
+## Signed uploads
+
+R2 supports presigned PUT uploads. It does not support S3 POST Object policies, so `SignedUploadOptions.MaxSize` returns a provider error.
+
+```go
+upload, err := client.SignedUploadURL(ctx, "uploads/report.pdf", files.SignedUploadOptions{
+	ContentType: "application/pdf",
+	ExpiresIn: 10 * time.Minute,
+})
+if err != nil {
+	return err
+}
+
+fmt.Println(upload.Method)
+// Output: PUT
+```

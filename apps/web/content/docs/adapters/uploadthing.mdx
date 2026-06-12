@@ -1,0 +1,57 @@
+---
+title: UploadThing
+description: Use UploadThing UFS as a Files SDK backend with custom IDs as keys.
+appliesTo: Go 1.26+
+---
+
+## Create the adapter
+
+```go
+package main
+
+import (
+	"context"
+	"os"
+
+	files "github.com/cersho/gofiles-sdk/packages/files-sdk"
+	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/uploadthing"
+)
+
+func newClient(ctx context.Context) (*files.Client, error) {
+	adapter, err := uploadthing.New(uploadthing.Options{
+		Token: os.Getenv("UPLOADTHING_TOKEN"),
+		ACL: uploadthing.ACLPublicRead,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return files.New(files.Options{Adapter: adapter})
+}
+```
+
+## Environment variables
+
+When `Token` is empty, the adapter reads:
+
+| Variable | Purpose |
+| --- | --- |
+| `UPLOADTHING_TOKEN` | UploadThing token. |
+
+## Signed upload URLs
+
+UploadThing signed upload URLs include the provider-specific headers and fields needed by clients.
+
+```go
+upload, err := client.SignedUploadURL(ctx, "uploads/report.pdf", files.SignedUploadOptions{
+	ContentType: "application/pdf",
+	ExpiresIn: 10 * time.Minute,
+})
+if err != nil {
+	return err
+}
+
+fmt.Println(upload.Method, upload.URL)
+```
+
+UploadThing uses custom IDs as Files SDK keys.

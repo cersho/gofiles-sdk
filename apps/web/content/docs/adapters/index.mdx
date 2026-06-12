@@ -1,0 +1,50 @@
+---
+title: Adapters
+description: Configure storage backends and pass the adapter to files.New.
+appliesTo: Go 1.26+
+---
+
+## Adapter contract
+
+Every adapter implements `files.Adapter`.
+
+```go
+type Adapter interface {
+	Name() string
+	Raw() any
+	Capabilities() AdapterCapabilities
+	Upload(context.Context, string, Body, UploadOptions) (UploadResult, error)
+	Download(context.Context, string, DownloadOptions) (StoredFile, error)
+	Head(context.Context, string, OperationOptions) (StoredFile, error)
+	Exists(context.Context, string, OperationOptions) (bool, error)
+	Delete(context.Context, string, OperationOptions) error
+	Copy(context.Context, string, string, OperationOptions) error
+	List(context.Context, ListOptions) (ListResult, error)
+	URL(context.Context, string, URLOptions) (string, error)
+	SignedUploadURL(context.Context, string, SignedUploadOptions) (SignedUpload, error)
+}
+```
+
+## Use an adapter
+
+```go
+adapter := memory.New(memory.Options{})
+
+client, err := files.New(files.Options{Adapter: adapter})
+if err != nil {
+	return err
+}
+
+fmt.Println(client.Adapter().Name())
+// Output: memory
+```
+
+## Provider pages
+
+- [Memory](/adapters/memory)
+- [Filesystem](/adapters/fs)
+- [S3](/adapters/s3)
+- [Cloudflare R2](/adapters/r2)
+- [S3-compatible](/adapters/s3-compatible)
+- [DigitalOcean Spaces](/adapters/digitalocean-spaces)
+- [UploadThing](/adapters/uploadthing)

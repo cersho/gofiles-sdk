@@ -1,0 +1,34 @@
+# Go
+bin/
+coverage.out
+.gocache/
+.gocache-vet/
+.gomodcache/
+
+# Logs
+logs
+*.log
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Node/Bun
+node_modules/
+*.tsbuildinfo
+bun.lockb
+
+# Next.js
+.next/
+out/
+
+# Fumadocs
+.source/
+
+# Build artifacts
+dist/
+
+# OS
+.DS_Store
+Thumbs.db

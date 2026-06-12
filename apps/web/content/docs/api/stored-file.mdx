@@ -1,0 +1,73 @@
+---
+title: StoredFile
+description: StoredFile represents downloaded content or object metadata returned by Download, Head, List, and ListAll.
+appliesTo: Go 1.26+
+---
+
+## Fields
+
+```go
+type StoredFile struct {
+	Key          string
+	Name         string
+	Size         int64
+	ContentType  string
+	LastModified time.Time
+	ETag         string
+	Metadata     map[string]string
+}
+```
+
+## Read the body
+
+`Download` returns a `StoredFile` with body accessors.
+
+```go
+stored, err := client.Download(ctx, "profiles/ada.txt", files.DownloadOptions{})
+if err != nil {
+	return err
+}
+
+text, err := stored.Text(ctx)
+if err != nil {
+	return err
+}
+
+fmt.Println(stored.Key, text)
+```
+
+Use `Open` for streaming:
+
+```go
+stored, err := client.Download(ctx, "reports/q1.pdf", files.DownloadOptions{})
+if err != nil {
+	return err
+}
+
+reader, err := stored.Open(ctx)
+if err != nil {
+	return err
+}
+defer reader.Close()
+
+_, err = io.Copy(destination, reader)
+```
+
+## Construct a stored file
+
+Adapter authors can use `NewStoredFile` or `NewStoredFileFromBytes`.
+
+```go
+stored := files.NewStoredFileFromBytes(files.StoredFileMeta{
+	Key: "fixtures/readme.txt",
+	ContentType: "text/plain",
+}, []byte("fixture"))
+
+text, err := stored.Text(ctx)
+if err != nil {
+	return err
+}
+
+fmt.Println(text)
+// Output: fixture
+```
