@@ -1,0 +1,92 @@
+---
+title: Vercel Blob
+description: Use Vercel Blob as a Files SDK backend with OIDC or read-write token authentication.
+appliesTo: Go 1.26+
+---
+
+## Create the adapter
+
+```go
+package main
+
+import (
+	"context"
+
+	files "github.com/cersho/gofiles-sdk/packages/files-sdk"
+	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/vercelblob"
+)
+
+func newClient(ctx context.Context) (*files.Client, error) {
+	// On Vercel, OIDC is used when VERCEL_OIDC_TOKEN and BLOB_STORE_ID
+	// are available. Off Vercel, BLOB_READ_WRITE_TOKEN is used.
+	adapter, err := vercelblob.New(vercelblob.Options{})
+	if err != nil {
+		return nil, err
+	}
+
+	return files.New(files.Options{Adapter: adapter})
+}
+```
+
+For OIDC-only configuration, pass `OIDCToken` and `StoreID` or let the adapter read `VERCEL_OIDC_TOKEN` and `BLOB_STORE_ID` from the environment.
+
+```go
+adapter, err := vercelblob.New(vercelblob.Options{
+	OIDCToken: os.Getenv("VERCEL_OIDC_TOKEN"),
+	StoreID:   os.Getenv("BLOB_STORE_ID"),
+})
+```
+
+## Environment variables
+
+When options are empty, the adapter reads:
+
+| Variable | Purpose |
+| --- | --- |
+| `VERCEL_OIDC_TOKEN` | Vercel OIDC token for store-scoped operations. |
+| `BLOB_STORE_ID` | Blob store ID used with OIDC and public URL derivation. |
+| `BLOB_READ_WRITE_TOKEN` | Long-lived read-write token fallback. |
+
+An explicit `Token` option wins over OIDC. Otherwise, OIDC is used when both token and store ID are present. If neither credential mode is complete, construction returns a provider error.
+
+## Public and private blobs
+
+Public access is the default. It uploads blobs with `access: public`, supports byte ranges through the public CDN URL, and `URL` returns the permanent public URL. `ExpiresIn` is ignored because Vercel Blob has no signing primitive, and `ResponseContentDisposition` returns a provider error.
+
+Private access uploads blobs with `access: private`. Reads use authenticated blob fetches, range reads are not advertised, and `URL` returns a provider error because private blobs have no permanent public URL.
+
+```go
+adapter, err := vercelblob.New(vercelblob.Options{
+	Access: vercelblob.AccessPrivate,
+})
+```
+
+## Resumable uploads
+
+Vercel Blob supports resumable multipart uploads through `files.UploadControl`. The adapter uses Vercel's manual multipart API and stores the provider upload key in the resumable session.
+
+```go
+control := files.NewUploadControl()
+
+_, err := client.Upload(ctx, "videos/intro.mp4", files.FileBody("intro.mp4"), files.UploadOptions{
+	ContentType: "video/mp4",
+	Control:     control,
+})
+```
+
+Vercel Blob does not expose an abort-multipart primitive, so `Abort` stops the local upload flow but does not send a provider-side cleanup request.
+
+## Compatibility
+
+| Method | Status | Notes |
+| --- | :---: | --- |
+| `upload` | Yes | Cache-Control maps to Vercel's max-age option. User metadata is not supported. |
+| `download` | Yes | Public blobs support ranges. Private blobs read with credentials and do not support ranges. |
+| `delete` | Yes | Bulk delete uses Vercel's multi-delete endpoint. |
+| `list` | Yes | Directory-style listing supports the `/` delimiter only. |
+| `search` | Yes | Uses SDK list/search behavior. |
+| `head` | Yes | Returns metadata and exposes a lazy body. |
+| `exists` | Yes | Returns false only for provider NotFound responses. |
+| `copy` | Yes | Uses Vercel's server-side copy endpoint. |
+| `url` | Partial | Public blobs return permanent CDN URLs; private blobs are unsupported. |
+| `signedUploadUrl` | No | Vercel Blob has no presigned upload primitive for this API. Use Vercel client uploads instead. |
