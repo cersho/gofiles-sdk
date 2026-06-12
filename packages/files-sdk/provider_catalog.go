@@ -134,9 +134,33 @@ var Providers = map[string]Provider{
 			}},
 		},
 	},
+	"vercel-blob": {
+		Slug:        "vercel-blob",
+		Name:        "Vercel Blob",
+		Description: "Vercel Blob via the Blob HTTP API.",
+		Env: ProviderEnvSpec{
+			Config: []string{"access"},
+			CredentialModes: []EnvGroup{
+				{
+					Label: "OIDC",
+					Vars: []EnvVar{
+						{Key: "VERCEL_OIDC_TOKEN", Description: "Vercel OIDC token", Secret: true, ReadBy: "gofiles-sdk"},
+						{Key: "BLOB_STORE_ID", Description: "Vercel Blob store ID", Secret: false, ReadBy: "gofiles-sdk"},
+					},
+				},
+				{
+					Label: "Read-write token",
+					Vars: []EnvVar{
+						{Key: "BLOB_READ_WRITE_TOKEN", Description: "Vercel Blob read-write token", Secret: true, ReadBy: "gofiles-sdk"},
+					},
+				},
+			},
+			Notes: "OIDC is preferred on Vercel when both VERCEL_OIDC_TOKEN and BLOB_STORE_ID are available. Token authentication is used as the fallback.",
+		},
+	},
 }
 
-var ProviderNames = []string{"digitalocean-spaces", "fs", "memory", "r2", "s3", "s3-compatible", "uploadthing"}
+var ProviderNames = []string{"digitalocean-spaces", "fs", "memory", "r2", "s3", "s3-compatible", "uploadthing", "vercel-blob"}
 
 func GetProvider(slug string) (Provider, bool) {
 	provider, ok := Providers[slug]
