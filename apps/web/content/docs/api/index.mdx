@@ -9,15 +9,15 @@ appliesTo: Go 1.26+
 The root package is:
 
 ```go
-import files "github.com/cersho/gofiles-sdk/packages/files-sdk"
+import files "github.com/cersho/gofiles-sdk"
 ```
 
 Provider packages live under `providers`. Plugin packages live under `plugins`.
 
 ```go
 import (
-	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/s3"
-	"github.com/cersho/gofiles-sdk/packages/files-sdk/plugins/validation"
+	"github.com/cersho/gofiles-sdk/providers/s3"
+	"github.com/cersho/gofiles-sdk/plugins/validation"
 )
 ```
 

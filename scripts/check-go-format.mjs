@@ -3,7 +3,20 @@ import { existsSync, readdirSync, statSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 
-const root = "packages/files-sdk";
+const root = ".";
+const ignoredDirs = new Set([
+  ".git",
+  ".github",
+  ".gocache",
+  ".gocache-vet",
+  ".gomodcache",
+  ".next",
+  ".source",
+  "apps",
+  "dist",
+  "node_modules",
+  "packages",
+]);
 
 const listGoFiles = (dir) => {
   const entries = readdirSync(dir, { withFileTypes: true });
@@ -12,6 +25,9 @@ const listGoFiles = (dir) => {
   for (const entry of entries) {
     const path = join(dir, entry.name);
     if (entry.isDirectory()) {
+      if (ignoredDirs.has(entry.name)) {
+        continue;
+      }
       files.push(...listGoFiles(path));
       continue;
     }
@@ -25,7 +41,7 @@ const listGoFiles = (dir) => {
 };
 
 if (!existsSync(root) || !statSync(root).isDirectory()) {
-  console.error(`Missing Go package directory: ${root}`);
+  console.error(`Missing Go project directory: ${root}`);
   process.exit(1);
 }
 

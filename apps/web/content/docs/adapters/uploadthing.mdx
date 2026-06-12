@@ -13,8 +13,8 @@ import (
 	"context"
 	"os"
 
-	files "github.com/cersho/gofiles-sdk/packages/files-sdk"
-	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/uploadthing"
+	files "github.com/cersho/gofiles-sdk"
+	"github.com/cersho/gofiles-sdk/providers/uploadthing"
 )
 
 func newClient(ctx context.Context) (*files.Client, error) {

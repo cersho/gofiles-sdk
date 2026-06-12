@@ -6,7 +6,7 @@ permissions:
 on:
   push:
     tags:
-      - "packages/files-sdk/v*"
+      - "v*"
 
 jobs:
   validate:
@@ -20,9 +20,9 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: packages/files-sdk/go.mod
+          go-version-file: go.mod
           cache: true
-          cache-dependency-path: packages/files-sdk/go.sum
+          cache-dependency-path: go.sum
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2

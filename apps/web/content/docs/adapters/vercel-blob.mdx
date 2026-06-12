@@ -12,8 +12,8 @@ package main
 import (
 	"context"
 
-	files "github.com/cersho/gofiles-sdk/packages/files-sdk"
-	"github.com/cersho/gofiles-sdk/packages/files-sdk/providers/vercelblob"
+	files "github.com/cersho/gofiles-sdk"
+	"github.com/cersho/gofiles-sdk/providers/vercelblob"
 )
 
 func newClient(ctx context.Context) (*files.Client, error) {
