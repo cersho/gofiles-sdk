@@ -2,6 +2,7 @@ import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import type { ReactNode } from "react";
+import { Analytics } from "@vercel/analytics/next"
 
 import { cn } from "@/lib/utils";
 
@@ -79,6 +80,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => (
       />
       <RootProvider search={{ options: { api: "/search" } }}>
         {children}
+        <Analytics />
       </RootProvider>
     </body>
   </html>
