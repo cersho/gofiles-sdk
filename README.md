@@ -1,6 +1,7 @@
 # Go Files SDK
 
 A unified storage SDK for Go services that need one client shape across object and blob storage providers.
+Heavily inspired by [files-sdk](https://github.com/haydenbleasel/files-sdk) by [Hayden Bleasel](https://haydenbleasel.com/)
 
 ## Highlights
 
@@ -93,3 +94,4 @@ bun run docs:dev
 ## License
 
 [MIT](LICENSE)
+
