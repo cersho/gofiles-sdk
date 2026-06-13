@@ -68,18 +68,13 @@ Import only the adapter you use:
 | S3 | `github.com/cersho/gofiles-sdk/providers/s3` |
 | Cloudflare R2 | `github.com/cersho/gofiles-sdk/providers/r2` |
 | S3-compatible storage | `github.com/cersho/gofiles-sdk/providers/s3compatible` |
+| Appwrite | `github.com/cersho/gofiles-sdk/providers/appwrite` |
 | DigitalOcean Spaces | `github.com/cersho/gofiles-sdk/providers/digitaloceanspaces` |
 | Supabase Storage | `github.com/cersho/gofiles-sdk/providers/supabase` |
 | UploadThing | `github.com/cersho/gofiles-sdk/providers/uploadthing` |
 | Vercel Blob | `github.com/cersho/gofiles-sdk/providers/vercelblob` |
 
 S3-backed adapters use AWS SDK for Go v2, which is already declared by the module.
-
-## What You Get
-
-- Client creation with `files.New` or `files.MustNew`, plus upload inputs from `StringBody`, `BytesBody`, `ReaderBody`, `FileBody`, or `NewBodyFromReadCloser`.
-- Key-scoped operations with `client.File(key)`, bounded-concurrency work with the `*Many` methods, and cross-client copies with `files.Transfer`.
-- Normalized `*files.Error` values with `NotFound`, `Unauthorized`, `Conflict`, `ReadOnly`, and `Provider` codes.
 
 ## Development
 
