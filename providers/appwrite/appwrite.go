@@ -431,15 +431,15 @@ func queryStartsWith(attr string, value string) string {
 
 func query(method string, attribute string, values []any) string {
 	payload := struct {
-		Method    string `json:"method"`
-		Attribute string `json:"attribute,omitempty"`
-		Values    []any  `json:"values,omitempty"`
+		Method string `json:"method"`
+		Column string `json:"column,omitempty"`
+		Values []any  `json:"values,omitempty"`
 	}{
 		Method: method,
 		Values: values,
 	}
 	if attribute != "" {
-		payload.Attribute = attribute
+		payload.Column = attribute
 	}
 	data, _ := json.Marshal(payload)
 	return string(data)

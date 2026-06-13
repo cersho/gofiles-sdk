@@ -101,8 +101,7 @@ func (d *resumableDriver) Complete(_ context.Context, parts []files.PartMeta) (f
 }
 
 func (d *resumableDriver) Abort(ctx context.Context) error {
-	_ = d.adapter.Delete(ctx, d.key, files.OperationOptions{})
-	return nil
+	return d.adapter.Delete(ctx, d.key, files.OperationOptions{})
 }
 
 func (d *resumableDriver) sessionSizeWith(part files.ResumablePart) int64 {

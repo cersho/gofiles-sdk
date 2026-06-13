@@ -191,7 +191,7 @@ func TestCoreHTTPContracts(t *testing.T) {
 	joinedQueries := strings.Join(listQueries, "\n")
 	if !strings.Contains(joinedQueries, `"method":"limit"`) ||
 		!strings.Contains(joinedQueries, `"method":"startsWith"`) ||
-		!strings.Contains(joinedQueries, `"attribute":"name"`) ||
+		!strings.Contains(joinedQueries, `"column":"name"`) ||
 		!strings.Contains(joinedQueries, `"method":"cursorAfter"`) {
 		t.Fatalf("list queries = %#v", listQueries)
 	}
@@ -316,6 +316,33 @@ func TestResumableUpload(t *testing.T) {
 	}
 	if !deleteCalled {
 		t.Fatal("abort did not delete partial file")
+	}
+}
+
+func TestResumableAbortPropagatesDeleteError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.Method == http.MethodDelete && r.URL.Path == "/storage/buckets/uploads/files/doc":
+			writeJSON(t, w, http.StatusInternalServerError, map[string]any{"message": "delete failed"})
+		default:
+			t.Fatalf("unexpected request: %s %s", r.Method, r.URL.String())
+		}
+	}))
+	defer server.Close()
+
+	adapter, err := New(Options{Bucket: testBucket, Endpoint: server.URL, ProjectID: testProject, Key: testKey})
+	if err != nil {
+		t.Fatal(err)
+	}
+	driver, err := adapter.ResumableUpload(context.Background(), "doc", files.ResumableUploadOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := driver.Begin(context.Background(), files.ResumableUploadMeta{Key: "doc", Size: 1}); err != nil {
+		t.Fatal(err)
+	}
+	if err := driver.Abort(context.Background()); !files.IsCode(err, files.ErrProvider) {
+		t.Fatalf("abort error = %#v", err)
 	}
 }
 
