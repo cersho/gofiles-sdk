@@ -1,0 +1,89 @@
+---
+title: Appwrite
+description: Use Appwrite Storage as a Files SDK backend through the Storage REST API.
+appliesTo: Go 1.26+
+---
+
+## Create the adapter
+
+```go
+package main
+
+import (
+	"context"
+
+	files "github.com/cersho/gofiles-sdk"
+	"github.com/cersho/gofiles-sdk/providers/appwrite"
+)
+
+func newClient(ctx context.Context) (*files.Client, error) {
+	adapter, err := appwrite.New(appwrite.Options{
+		Bucket: "uploads",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return files.New(files.Options{Adapter: adapter})
+}
+```
+
+## Environment variables
+
+When options are empty, the adapter reads:
+
+| Variable | Purpose |
+| --- | --- |
+| `APPWRITE_ENDPOINT` | Appwrite API endpoint. Defaults to `https://cloud.appwrite.io/v1`. |
+| `NEXT_PUBLIC_APPWRITE_ENDPOINT` | Endpoint fallback. |
+| `APPWRITE_PROJECT_ID` | Appwrite project ID. |
+| `NEXT_PUBLIC_APPWRITE_PROJECT_ID` | Project ID fallback. |
+| `APPWRITE_API_KEY` | Appwrite API key. |
+| `APPWRITE_KEY` | API key fallback. |
+
+## Public URLs
+
+`URL` returns a permanent Appwrite view URL only when the bucket is public and the adapter is created with `Public: true`.
+
+```go
+adapter, err := appwrite.New(appwrite.Options{
+	Bucket: "uploads",
+	Public: true,
+})
+```
+
+## Resumable uploads
+
+Appwrite resumable uploads use Appwrite's chunked file upload endpoint through `files.UploadControl`. Chunks are fixed at 5 MiB, matching Appwrite's API.
+
+```go
+control := files.NewUploadControl()
+
+_, err := client.Upload(ctx, "video_intro", files.FileBody("intro.mp4"), files.UploadOptions{
+	ContentType: "video/mp4",
+	Control:     control,
+})
+```
+
+## Limitations
+
+Appwrite file IDs are used as Files SDK keys. They must start with an alphanumeric character, use only letters, digits, `.`, `_`, and `-`, and be at most 36 characters. Slashes are not supported.
+
+`List` prefix filtering queries Appwrite's `name` field because Appwrite Storage does not expose `$id` as a documented list filter field. Files uploaded through this adapter use the key as both file ID and uploaded filename, so prefix list works for adapter-created files.
+
+`metadata`, `cacheControl`, signed upload URLs, signed read URLs, and server-side copy are not supported by Appwrite Storage. `Copy` downloads the source and uploads the destination.
+
+## Compatibility
+
+| Method | Status | Notes |
+| --- | :---: | --- |
+| `upload` | Partial | Appwrite chooses the stored MIME type. Metadata and cache-control are not supported. |
+| `download` | Yes | |
+| `delete` | Yes | |
+| `list` | Yes | Prefix filters use Appwrite queries against `name`; directory-style `delimiter` listing is not supported. |
+| `search` | Yes | Uses SDK list/search behavior. |
+| `head` | Yes | Exposes a lazy body. |
+| `exists` | Yes | Returns false only for provider NotFound responses. |
+| `copy` | Partial | Read-then-write; not server-side or atomic. |
+| `url` | Partial | Public bucket permanent view URL only. |
+| `signedUploadUrl` | No | Appwrite has no presigned upload primitive. |
