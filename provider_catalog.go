@@ -30,6 +30,27 @@ type Provider struct {
 }
 
 var Providers = map[string]Provider{
+	"appwrite": {
+		Slug:        "appwrite",
+		Name:        "Appwrite",
+		Description: "Appwrite Storage via the Storage REST API.",
+		Env: ProviderEnvSpec{
+			Config: []string{"bucket", "endpoint", "projectId"},
+			Required: []EnvVar{
+				{Key: "APPWRITE_PROJECT_ID", Aliases: []string{"NEXT_PUBLIC_APPWRITE_PROJECT_ID"}, Description: "Appwrite project ID", Secret: false, ReadBy: "gofiles-sdk"},
+			},
+			CredentialModes: []EnvGroup{{
+				Label: "API key",
+				Vars: []EnvVar{
+					{Key: "APPWRITE_API_KEY", Aliases: []string{"APPWRITE_KEY"}, Description: "Appwrite API key", Secret: true, ReadBy: "gofiles-sdk"},
+				},
+			}},
+			Optional: []EnvVar{
+				{Key: "APPWRITE_ENDPOINT", Aliases: []string{"NEXT_PUBLIC_APPWRITE_ENDPOINT"}, Description: "Appwrite API endpoint", Secret: false, ReadBy: "gofiles-sdk"},
+			},
+			Notes: "File IDs must be Appwrite-compatible IDs: max 36 characters, no slashes.",
+		},
+	},
 	"digitalocean-spaces": {
 		Slug:        "digitalocean-spaces",
 		Name:        "DigitalOcean Spaces",
@@ -182,7 +203,7 @@ var Providers = map[string]Provider{
 	},
 }
 
-var ProviderNames = []string{"digitalocean-spaces", "fs", "memory", "r2", "s3", "s3-compatible", "supabase", "uploadthing", "vercel-blob"}
+var ProviderNames = []string{"appwrite", "digitalocean-spaces", "fs", "memory", "r2", "s3", "s3-compatible", "supabase", "uploadthing", "vercel-blob"}
 
 func GetProvider(slug string) (Provider, bool) {
 	provider, ok := Providers[slug]
