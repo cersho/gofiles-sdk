@@ -1,0 +1,84 @@
+---
+title: Supabase Storage
+description: Use Supabase Storage as a Files SDK backend through the Storage HTTP API.
+appliesTo: Go 1.26+
+---
+
+## Create the adapter
+
+```go
+package main
+
+import (
+	"context"
+
+	files "github.com/cersho/gofiles-sdk"
+	"github.com/cersho/gofiles-sdk/providers/supabase"
+)
+
+func newClient(ctx context.Context) (*files.Client, error) {
+	adapter, err := supabase.New(supabase.Options{
+		Bucket: "uploads",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return files.New(files.Options{Adapter: adapter})
+}
+```
+
+## Environment variables
+
+When options are empty, the adapter reads:
+
+| Variable | Purpose |
+| --- | --- |
+| `SUPABASE_URL` | Supabase project URL. |
+| `NEXT_PUBLIC_SUPABASE_URL` | Project URL fallback. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Preferred key for server-side writes. |
+| `SUPABASE_KEY` | Alternative API key fallback. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key fallback for public bucket use cases. |
+
+Buckets must already exist. Use a service role key for writes to buckets protected by RLS.
+
+## Public URLs
+
+By default, `URL` creates a signed read URL. For public buckets, set `Public: true` to return the Supabase public object URL. Use `PublicBaseURL` when a CDN fronts the bucket.
+
+```go
+adapter, err := supabase.New(supabase.Options{
+	Bucket:        "uploads",
+	PublicBaseURL: "https://cdn.example.com",
+})
+```
+
+`ResponseContentDisposition` forces the signed path so the disposition is bound into the URL. Supabase only supports attachment-style download overrides.
+
+## Resumable uploads
+
+Supabase resumable uploads use TUS through `files.UploadControl`. The adapter uses a 6 MiB minimum part size.
+
+```go
+control := files.NewUploadControl()
+
+_, err := client.Upload(ctx, "videos/intro.mp4", files.FileBody("intro.mp4"), files.UploadOptions{
+	ContentType: "video/mp4",
+	Control:     control,
+})
+```
+
+## Compatibility
+
+| Method | Status | Notes |
+| --- | :---: | --- |
+| `upload` | Yes | Supports content type, cache-control, user metadata, and progress. |
+| `download` | Yes | Range reads are not advertised. |
+| `delete` | Yes | Bulk delete uses Supabase's batch remove endpoint. |
+| `list` | Yes | Uses the V2 list API; directory-style listing supports `/`. |
+| `search` | Yes | Uses SDK list/search behavior. |
+| `head` | Yes | Uses Supabase object info and exposes a lazy body. |
+| `exists` | Yes | Returns false only for provider NotFound responses. |
+| `copy` | Yes | Uses Supabase server-side copy. |
+| `url` | Partial | Signed URLs by default; public bucket/CDN fast paths when configured. |
+| `signedUploadUrl` | Partial | Returns a PUT URL with `x-upsert: true`; size limits are not supported. |
