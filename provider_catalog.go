@@ -121,6 +121,28 @@ var Providers = map[string]Provider{
 		},
 		PeerDeps: []string{"github.com/aws/aws-sdk-go-v2/service/s3"},
 	},
+	"supabase": {
+		Slug:        "supabase",
+		Name:        "Supabase Storage",
+		Description: "Supabase Storage via the Storage HTTP API.",
+		Env: ProviderEnvSpec{
+			Config: []string{"bucket"},
+			Required: []EnvVar{
+				{Key: "SUPABASE_URL", Aliases: []string{"NEXT_PUBLIC_SUPABASE_URL"}, Description: "Supabase project URL", Secret: false, ReadBy: "gofiles-sdk"},
+			},
+			CredentialModes: []EnvGroup{{
+				Label: "API key",
+				Vars: []EnvVar{
+					{Key: "SUPABASE_SERVICE_ROLE_KEY", Description: "Supabase service role key", Secret: true, ReadBy: "gofiles-sdk"},
+				},
+			}},
+			Optional: []EnvVar{
+				{Key: "SUPABASE_KEY", Description: "Alternative Supabase API key", Secret: true, ReadBy: "gofiles-sdk"},
+				{Key: "NEXT_PUBLIC_SUPABASE_ANON_KEY", Description: "Anon key for public bucket use cases", Secret: true, ReadBy: "gofiles-sdk"},
+			},
+			Notes: "Buckets must already exist. Use a service role key for writes to RLS-protected buckets.",
+		},
+	},
 	"uploadthing": {
 		Slug:        "uploadthing",
 		Name:        "UploadThing",
@@ -160,7 +182,7 @@ var Providers = map[string]Provider{
 	},
 }
 
-var ProviderNames = []string{"digitalocean-spaces", "fs", "memory", "r2", "s3", "s3-compatible", "uploadthing", "vercel-blob"}
+var ProviderNames = []string{"digitalocean-spaces", "fs", "memory", "r2", "s3", "s3-compatible", "supabase", "uploadthing", "vercel-blob"}
 
 func GetProvider(slug string) (Provider, bool) {
 	provider, ok := Providers[slug]
