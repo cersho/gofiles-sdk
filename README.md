@@ -69,6 +69,7 @@ Import only the adapter you use:
 | Cloudflare R2 | `github.com/cersho/gofiles-sdk/providers/r2` |
 | S3-compatible storage | `github.com/cersho/gofiles-sdk/providers/s3compatible` |
 | DigitalOcean Spaces | `github.com/cersho/gofiles-sdk/providers/digitaloceanspaces` |
+| Supabase Storage | `github.com/cersho/gofiles-sdk/providers/supabase` |
 | UploadThing | `github.com/cersho/gofiles-sdk/providers/uploadthing` |
 | Vercel Blob | `github.com/cersho/gofiles-sdk/providers/vercelblob` |
 
@@ -94,4 +95,3 @@ bun run docs:dev
 ## License
 
 [MIT](LICENSE)
-
