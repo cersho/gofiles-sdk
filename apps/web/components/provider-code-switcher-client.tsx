@@ -31,7 +31,7 @@ export const ProviderCodeSwitcherClient = ({
   };
 
   return (
-    <div className="overflow-hidden rounded-lg border border-dotted bg-background">
+    <div className="overflow-hidden rounded-lg bg-background shadow-[var(--shadow-border)]">
       <div className="grid lg:grid-cols-[13rem_1fr]">
         <div className="border-b border-dotted bg-muted/35 p-2 lg:border-r lg:border-b-0">
           <p className="px-3 pt-2 pb-3 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">
@@ -40,16 +40,20 @@ export const ProviderCodeSwitcherClient = ({
           <div className="grid gap-1 sm:grid-cols-5 lg:grid-cols-1">
             {samples.map((sample) => (
               <button
-                className="flex min-h-10 items-center justify-between rounded-md px-3 text-left text-sm text-muted-foreground transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[active=true]:bg-background data-[active=true]:text-foreground data-[active=true]:shadow-sm"
+                className="flex min-h-10 items-center justify-between rounded-md px-3 text-left text-sm text-muted-foreground transition-[scale,background-color,color,box-shadow] duration-150 ease-out hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 active:scale-[0.96] data-[active=true]:bg-background data-[active=true]:text-foreground data-[active=true]:shadow-[var(--shadow-border)]"
                 data-active={sample.id === active.id}
                 key={sample.id}
                 onClick={() => setActive(sample)}
                 type="button"
               >
                 <span>{sample.label}</span>
-                {sample.id === active.id ? (
-                  <Check className="size-3.5 text-[#0087a8]" />
-                ) : null}
+                <Check
+                  className={`size-3.5 text-[#0087a8] transition-[scale,opacity,filter] duration-300 ease-[cubic-bezier(0.2,0,0,1)] ${
+                    sample.id === active.id
+                      ? "scale-100 opacity-100 blur-0"
+                      : "scale-[0.25] opacity-0 blur-[4px]"
+                  }`}
+                />
               </button>
             ))}
           </div>
@@ -64,19 +68,30 @@ export const ProviderCodeSwitcherClient = ({
             </div>
             <div className="flex items-center gap-2">
               <button
-                className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-sm font-medium text-[#007a99] transition-colors hover:bg-[#00add8]/10 hover:text-[#005b73] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                className="inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-sm font-medium text-[#007a99] transition-[scale,background-color,color] duration-150 ease-out hover:bg-[#00add8]/10 hover:text-[#005b73] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 active:scale-[0.96]"
                 onClick={copyCode}
                 type="button"
               >
-                {copied ? (
-                  <Check className="size-3.5" />
-                ) : (
-                  <Copy className="size-3.5" />
-                )}
+                <span className="relative size-3.5">
+                  <Copy
+                    className={`absolute inset-0 size-3.5 transition-[scale,opacity,filter] duration-300 ease-[cubic-bezier(0.2,0,0,1)] ${
+                      copied
+                        ? "scale-[0.25] opacity-0 blur-[4px]"
+                        : "scale-100 opacity-100 blur-0"
+                    }`}
+                  />
+                  <Check
+                    className={`absolute inset-0 size-3.5 transition-[scale,opacity,filter] duration-300 ease-[cubic-bezier(0.2,0,0,1)] ${
+                      copied
+                        ? "scale-100 opacity-100 blur-0"
+                        : "scale-[0.25] opacity-0 blur-[4px]"
+                    }`}
+                  />
+                </span>
                 {copied ? "Copied" : "Copy"}
               </button>
               <Link
-                className="hidden h-8 items-center gap-1.5 rounded-full px-3 text-sm font-medium text-[#007a99] transition-colors hover:bg-[#00add8]/10 hover:text-[#005b73] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:inline-flex"
+                className="hidden h-10 items-center gap-1.5 rounded-full px-3 text-sm font-medium text-[#007a99] transition-[scale,background-color,color] duration-150 ease-out hover:bg-[#00add8]/10 hover:text-[#005b73] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 active:scale-[0.96] sm:inline-flex"
                 href={active.href}
               >
                 View more
@@ -99,7 +114,7 @@ export const ProviderCodeSwitcherClient = ({
               The adapter changes. The upload call underneath stays the same.
             </p>
             <Link
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-[#007a99] transition-colors hover:text-[#005b73]"
+              className="inline-flex min-h-10 items-center gap-1.5 text-sm font-medium text-[#007a99] transition-colors hover:text-[#005b73]"
               href="/adapters"
             >
               View more adapters

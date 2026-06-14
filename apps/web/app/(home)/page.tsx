@@ -85,16 +85,16 @@ const AdapterMarquee = ({ items }: { items: typeof adapters }) => (
       >
         {items.map((adapter) => (
           <Link
-            className="group flex h-18 min-w-56 items-center gap-4 rounded-lg border border-dotted bg-background px-4 shadow-sm shadow-black/[0.03] transition-colors hover:border-[#00add8]/55 hover:bg-[#00add8]/5 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-muted/25 dark:shadow-none dark:hover:bg-muted/40"
+            className="group flex h-18 min-w-56 items-center gap-4 rounded-xl bg-background px-4 shadow-[var(--shadow-border)] transition-[background-color,box-shadow] duration-150 ease-out hover:bg-[#00add8]/5 hover:shadow-[var(--shadow-border-hover)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-muted/25 dark:hover:bg-muted/40"
             href={adapter.href}
             key={`${group}-${adapter.name}`}
             tabIndex={group === 1 ? -1 : undefined}
           >
-            <span className="grid size-12 shrink-0 place-items-center rounded-md border border-dotted bg-white text-[11px] font-semibold text-[#007a99]">
+            <span className="grid size-12 shrink-0 place-items-center rounded-lg bg-white text-[11px] font-semibold text-[#007a99] shadow-[var(--shadow-border)]">
               {"logo" in adapter && adapter.logo ? (
                 <img
                   alt=""
-                  className="max-h-7 max-w-7 object-contain transition-transform duration-200 ease-out group-hover:scale-105"
+                  className="max-h-7 max-w-7 object-contain transition-transform duration-200 ease-out group-hover:scale-105 dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-white/10"
                   height="28"
                   loading="lazy"
                   src={adapter.logo}
@@ -140,7 +140,7 @@ const features = [
 const Home = () => (
   <main className="overflow-hidden">
     <section className="border-b border-dotted">
-      <div className="mx-auto flex min-h-[calc(100svh-4rem)] max-w-5xl flex-col items-center justify-center px-6 py-20 text-center sm:py-24">
+      <div className="mx-auto flex min-h-[calc(100svh-18rem)] max-w-5xl flex-col items-center justify-center px-6 py-16 text-center sm:py-20">
         <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:duration-700">
           <p className="font-mono text-xs tracking-wide text-[#0087a8] uppercase">
             Go Files SDK
@@ -188,20 +188,20 @@ const Home = () => (
             platforms behind one Go interface.
           </p>
           <div className="flex flex-wrap gap-2 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">
-            <span className="rounded-full border border-dotted bg-background px-3 py-1.5">
-              {adapters.length} adapters
+            <span className="rounded-full bg-background px-3 py-1.5 shadow-[var(--shadow-border)]">
+              <span className="tabular-nums">{adapters.length}</span> adapters
             </span>
-            <span className="rounded-full border border-dotted bg-background px-3 py-1.5">
+            <span className="rounded-full bg-background px-3 py-1.5 shadow-[var(--shadow-border)]">
               Same API
             </span>
-            <span className="rounded-full border border-dotted bg-background px-3 py-1.5">
+            <span className="rounded-full bg-background px-3 py-1.5 shadow-[var(--shadow-border)]">
               Provider-native setup
             </span>
           </div>
         </div>
       </div>
-      <div className="mt-12 border-y border-dotted bg-background/65 py-7 shadow-inner shadow-black/[0.02]">
-        <div className="overflow-hidden [-webkit-mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)] [mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)]">
+      <div className="mx-auto mt-12 max-w-6xl px-6">
+        <div className="overflow-hidden rounded-xl bg-background/65 py-7 shadow-[var(--shadow-border)] [-webkit-mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)] [mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)]">
           <AdapterMarquee items={adapters} />
         </div>
       </div>
@@ -224,13 +224,13 @@ const Home = () => (
               files through the same client surface everywhere else.
             </p>
             <div className="flex flex-wrap gap-2 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">
-              <span className="rounded-full border border-dotted bg-muted/35 px-3 py-1.5">
+              <span className="rounded-full bg-muted/35 px-3 py-1.5 shadow-[var(--shadow-border)]">
                 One client
               </span>
-              <span className="rounded-full border border-dotted bg-muted/35 px-3 py-1.5">
+              <span className="rounded-full bg-muted/35 px-3 py-1.5 shadow-[var(--shadow-border)]">
                 Typed options
               </span>
-              <span className="rounded-full border border-dotted bg-muted/35 px-3 py-1.5">
+              <span className="rounded-full bg-muted/35 px-3 py-1.5 shadow-[var(--shadow-border)]">
                 Provider setup only
               </span>
             </div>
@@ -238,7 +238,7 @@ const Home = () => (
         </div>
         <div className="relative">
           <div className="pointer-events-none absolute inset-x-8 -top-px h-px bg-gradient-to-r from-transparent via-[#00add8]/55 to-transparent" />
-          <div className="rounded-lg border border-dotted bg-muted/20 p-2">
+          <div className="rounded-2xl bg-muted/20 p-2 shadow-[var(--shadow-border)]">
             <ProviderCodeSwitcher />
           </div>
         </div>
@@ -298,14 +298,14 @@ const Home = () => (
         <div className="grid gap-4 sm:grid-cols-2">
           {features.map((feature, index) => (
             <div
-              className="group min-h-48 rounded-lg border border-dotted p-5 transition-colors hover:border-[#00add8]/45"
+              className="group min-h-48 rounded-xl bg-background p-5 shadow-[var(--shadow-border)] transition-[box-shadow] duration-150 ease-out hover:shadow-[var(--shadow-border-hover)]"
               key={feature.eyebrow}
             >
               <div className="flex items-center justify-between">
                 <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
                   {feature.eyebrow}
                 </p>
-                <span className="font-mono text-xs text-[#0087a8]">
+                <span className="font-mono text-xs tabular-nums text-[#0087a8]">
                   0{index + 1}
                 </span>
               </div>
@@ -333,7 +333,7 @@ const Home = () => (
             managed blob provider when your app needs it.
           </p>
         </div>
-        <div className="rounded-lg border border-dotted bg-muted/30 p-5">
+        <div className="rounded-2xl bg-muted/30 p-5 shadow-[var(--shadow-border)]">
           <div className="font-mono text-sm">
             <div className="flex items-center gap-3 border-b border-dotted pb-4">
               <Check className="size-4 text-[#0087a8]" />
