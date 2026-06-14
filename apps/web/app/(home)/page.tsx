@@ -141,18 +141,18 @@ const Home = () => (
   <main className="overflow-hidden">
     <section className="border-b border-dotted">
       <div className="mx-auto flex min-h-[calc(100svh-18rem)] max-w-5xl flex-col items-center justify-center px-6 py-16 text-center sm:py-20">
-        <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:duration-700">
-          <p className="font-mono text-xs tracking-wide text-[#0087a8] uppercase">
+        <div>
+          <p className="landing-reveal font-mono text-xs tracking-wide text-[#0087a8] uppercase">
             Go Files SDK
           </p>
-          <h1 className="mx-auto mt-5 max-w-[14ch] text-[3rem]/[0.98] font-medium tracking-tight text-balance text-foreground sm:text-7xl lg:text-8xl">
+          <h1 className="landing-reveal landing-reveal-delay-1 mx-auto mt-5 max-w-[14ch] text-[3rem]/[0.98] font-medium tracking-tight text-balance text-foreground sm:text-7xl lg:text-8xl">
             Store files with one Go client.
           </h1>
-          <p className="mx-auto mt-7 max-w-[58ch] text-base leading-relaxed text-pretty text-muted-foreground sm:text-xl">
+          <p className="landing-reveal landing-reveal-delay-2 mx-auto mt-7 max-w-[58ch] text-base leading-relaxed text-pretty text-muted-foreground sm:text-xl">
             Upload, download, list, move, copy, and sign files across object
             storage providers without rewriting your service code.
           </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+          <div className="landing-reveal landing-reveal-delay-3 mt-10 flex flex-wrap items-center justify-center gap-3">
             <Button asChild size="lg">
               <Link href="/overview">
                 Read the docs
@@ -166,14 +166,16 @@ const Home = () => (
               </Link>
             </Button>
           </div>
-          <HeroInstallCopy />
+          <div className="landing-reveal landing-reveal-delay-4">
+            <HeroInstallCopy />
+          </div>
         </div>
       </div>
     </section>
 
     <section className="relative border-b border-dotted bg-muted/20 py-16 sm:py-20">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00add8]/45 to-transparent" />
-      <div className="mx-auto grid max-w-6xl gap-8 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+      <div className="landing-reveal mx-auto grid max-w-6xl gap-8 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
         <div className="max-w-2xl">
           <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
             Supported adapters
@@ -200,7 +202,7 @@ const Home = () => (
           </div>
         </div>
       </div>
-      <div className="mx-auto mt-12 max-w-6xl px-6">
+      <div className="landing-reveal landing-reveal-delay-1 mx-auto mt-12 max-w-6xl px-6">
         <div className="overflow-hidden rounded-xl bg-background/65 py-7 shadow-[var(--shadow-border)] [-webkit-mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)] [mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)]">
           <AdapterMarquee items={adapters} />
         </div>
@@ -209,7 +211,7 @@ const Home = () => (
 
     <section className="border-b border-dotted">
       <div className="mx-auto grid max-w-6xl gap-8 px-6 py-20 sm:py-24">
-        <div className="max-w-3xl">
+        <div className="landing-reveal max-w-3xl">
           <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
             Same calls
           </p>
@@ -221,7 +223,7 @@ const Home = () => (
             through the same client surface everywhere else.
           </p>
         </div>
-        <div className="rounded-2xl bg-muted/20 p-2 shadow-[var(--shadow-border)]">
+        <div className="landing-reveal landing-reveal-delay-1 rounded-2xl bg-muted/20 p-2 shadow-[var(--shadow-border)]">
           <ProviderCodeSwitcher />
         </div>
       </div>
@@ -229,7 +231,7 @@ const Home = () => (
 
     <section className="border-b border-dotted bg-muted/20">
       <div className="mx-auto grid max-w-6xl gap-8 px-6 py-16 sm:py-20 lg:grid-cols-[1fr_auto] lg:items-center">
-        <div>
+        <div className="landing-reveal">
           <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
             Request adapter
           </p>
@@ -241,7 +243,7 @@ const Home = () => (
             your app needs. Adapter requests help prioritize what lands next.
           </p>
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-stretch">
+        <div className="landing-reveal landing-reveal-delay-1 flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-stretch">
           <Button asChild size="lg">
             <Link
               href="https://github.com/cersho/gofiles-sdk/issues/new?title=Adapter%20request%3A%20&labels=adapter"
@@ -265,7 +267,7 @@ const Home = () => (
 
     <section className="border-b border-dotted">
       <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 sm:py-24 lg:grid-cols-[0.82fr_1.18fr]">
-        <div className="lg:sticky lg:top-24 lg:self-start">
+        <div className="landing-reveal lg:sticky lg:top-24 lg:self-start">
           <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
             What stays consistent
           </p>
@@ -280,7 +282,7 @@ const Home = () => (
         <div className="grid gap-4 sm:grid-cols-2">
           {features.map((feature, index) => (
             <div
-              className="group min-h-48 rounded-xl bg-background p-5 shadow-[var(--shadow-border)] transition-[box-shadow] duration-150 ease-out hover:shadow-[var(--shadow-border-hover)]"
+              className="landing-reveal group min-h-48 rounded-xl bg-background p-5 shadow-[var(--shadow-border)] transition-[translate,box-shadow] duration-150 ease-out hover:-translate-y-0.5 hover:shadow-[var(--shadow-border-hover)]"
               key={feature.eyebrow}
             >
               <div className="flex items-center justify-between">
@@ -303,7 +305,7 @@ const Home = () => (
     <section className="relative">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00add8]/60 to-transparent" />
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-20 sm:py-24 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-        <div className="max-w-2xl">
+        <div className="landing-reveal max-w-2xl">
           <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
             Start here
           </p>
@@ -315,7 +317,7 @@ const Home = () => (
             managed blob provider when your app needs it.
           </p>
         </div>
-        <div className="rounded-2xl bg-muted/30 p-5 shadow-[var(--shadow-border)]">
+        <div className="landing-reveal landing-reveal-delay-1 rounded-2xl bg-muted/30 p-5 shadow-[var(--shadow-border)]">
           <div className="font-mono text-sm">
             <div className="flex items-center gap-3 border-b border-dotted pb-4">
               <Check className="size-4 text-[#0087a8]" />
