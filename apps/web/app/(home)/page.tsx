@@ -146,7 +146,29 @@ const Home = () => (
             Go Files SDK
           </p>
           <h1 className="landing-reveal landing-reveal-delay-1 mx-auto mt-5 max-w-[14ch] text-[3rem]/[0.98] font-medium tracking-tight text-balance text-foreground sm:text-7xl lg:text-8xl">
-            Store files with one Go client.
+            Store{" "}
+            <span className="sr-only">files</span>
+            <span aria-hidden="true" className="inline-flex align-[-0.08em]">
+              <img
+                alt=""
+                className="h-[0.74em] w-auto object-contain"
+                height="64"
+                src="https://logos.lndev.me/logos/files.svg"
+                width="64"
+              />
+            </span>{" "}
+            with one{" "}
+            <span className="sr-only">Go</span>
+            <span aria-hidden="true" className="inline-flex align-[-0.08em]">
+              <img
+                alt=""
+                className="h-[0.72em] w-auto object-contain"
+                height="64"
+                src="https://logos.lndev.me/logos/go.svg"
+                width="154"
+              />
+            </span>{" "}
+            client.
           </h1>
           <p className="landing-reveal landing-reveal-delay-2 mx-auto mt-7 max-w-[58ch] text-base leading-relaxed text-pretty text-muted-foreground sm:text-xl">
             Upload, download, list, move, copy, and sign files across object
@@ -211,11 +233,11 @@ const Home = () => (
 
     <section className="border-b border-dotted">
       <div className="mx-auto grid max-w-6xl gap-8 px-6 py-20 sm:py-24">
-        <div className="landing-reveal max-w-3xl">
+        <div className="landing-reveal w-full min-w-0 max-w-3xl">
           <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
             Same calls
           </p>
-          <h2 className="mt-4 max-w-[20ch] text-4xl font-medium tracking-tight text-balance text-foreground sm:text-5xl">
+          <h2 className="mt-4 max-w-full text-4xl font-medium tracking-tight text-balance text-foreground sm:max-w-[20ch] sm:text-5xl">
             Swap storage without rewriting the file flow.
           </h2>
           <p className="mt-5 max-w-[58ch] text-base leading-relaxed text-pretty text-muted-foreground">
@@ -223,7 +245,7 @@ const Home = () => (
             through the same client surface everywhere else.
           </p>
         </div>
-        <div className="landing-reveal landing-reveal-delay-1 rounded-2xl bg-muted/20 p-2 shadow-[var(--shadow-border)]">
+        <div className="landing-reveal landing-reveal-delay-1 w-full min-w-0 rounded-2xl bg-muted/20 p-2 shadow-[var(--shadow-border)]">
           <ProviderCodeSwitcher />
         </div>
       </div>
