@@ -98,6 +98,8 @@ code,
     0 0 0 1px rgba(0, 0, 0, 0.08),
     0 1px 2px -1px rgba(0, 0, 0, 0.08),
     0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  scrollbar-color: gray transparent;
+  scrollbar-width: thin;
 }
 
 .dark {
@@ -138,6 +140,48 @@ code,
 
   to {
     transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@layer utilities {
+  @keyframes landing-reveal {
+    from {
+      filter: blur(4px);
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    to {
+      filter: blur(0);
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .landing-reveal {
+    animation: landing-reveal 640ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  .landing-reveal-delay-1 {
+    animation-delay: 120ms;
+  }
+
+  .landing-reveal-delay-2 {
+    animation-delay: 240ms;
+  }
+
+  .landing-reveal-delay-3 {
+    animation-delay: 360ms;
+  }
+
+  .landing-reveal-delay-4 {
+    animation-delay: 480ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .landing-reveal {
+      animation: none;
+    }
   }
 }
 
