@@ -14,6 +14,8 @@ figure.shiki {
 figure.shiki,
 figure.shiki code,
 figure.shiki pre,
+.code-switcher-shiki pre,
+.code-switcher-shiki code,
 code,
 .font-mono {
   font-feature-settings:
@@ -117,4 +119,28 @@ code,
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.code-switcher-shiki pre {
+  margin: 0;
+  min-width: max-content;
+  padding: 1.25rem;
+}
+
+.code-switcher-shiki-light pre {
+  background: #f8fafc !important;
+}
+
+.code-switcher-shiki-dark pre {
+  background: #0b0f14 !important;
 }
