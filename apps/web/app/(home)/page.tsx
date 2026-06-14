@@ -208,39 +208,21 @@ const Home = () => (
     </section>
 
     <section className="border-b border-dotted">
-      <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 sm:py-24">
-        <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
-          <div className="max-w-2xl">
-            <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
-              Same calls
-            </p>
-            <h2 className="mt-4 max-w-[18ch] text-4xl font-medium tracking-tight text-balance text-foreground sm:text-5xl">
-              Swap storage without rewriting the file flow.
-            </h2>
-          </div>
-          <div className="grid gap-5 lg:justify-self-end">
-            <p className="max-w-[56ch] text-base leading-relaxed text-pretty text-muted-foreground">
-              Initialize the provider once. Upload, download, list, and sign
-              files through the same client surface everywhere else.
-            </p>
-            <div className="flex flex-wrap gap-2 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">
-              <span className="rounded-full bg-muted/35 px-3 py-1.5 shadow-[var(--shadow-border)]">
-                One client
-              </span>
-              <span className="rounded-full bg-muted/35 px-3 py-1.5 shadow-[var(--shadow-border)]">
-                Typed options
-              </span>
-              <span className="rounded-full bg-muted/35 px-3 py-1.5 shadow-[var(--shadow-border)]">
-                Provider setup only
-              </span>
-            </div>
-          </div>
+      <div className="mx-auto grid max-w-6xl gap-8 px-6 py-20 sm:py-24">
+        <div className="max-w-3xl">
+          <p className="font-mono text-xs tracking-wide text-muted-foreground uppercase">
+            Same calls
+          </p>
+          <h2 className="mt-4 max-w-[20ch] text-4xl font-medium tracking-tight text-balance text-foreground sm:text-5xl">
+            Swap storage without rewriting the file flow.
+          </h2>
+          <p className="mt-5 max-w-[58ch] text-base leading-relaxed text-pretty text-muted-foreground">
+            Configure the adapter once. Upload, download, list, and sign files
+            through the same client surface everywhere else.
+          </p>
         </div>
-        <div className="relative">
-          <div className="pointer-events-none absolute inset-x-8 -top-px h-px bg-gradient-to-r from-transparent via-[#00add8]/55 to-transparent" />
-          <div className="rounded-2xl bg-muted/20 p-2 shadow-[var(--shadow-border)]">
-            <ProviderCodeSwitcher />
-          </div>
+        <div className="rounded-2xl bg-muted/20 p-2 shadow-[var(--shadow-border)]">
+          <ProviderCodeSwitcher />
         </div>
       </div>
     </section>
