@@ -9,7 +9,11 @@ export const HeroInstallCopy = () => {
   const [copied, setCopied] = useState(false);
 
   const copyInstallCommand = async () => {
-    await navigator.clipboard.writeText(installCommand);
+    try {
+      await navigator.clipboard.writeText(installCommand);
+    } catch {
+      // Browsers can block clipboard writes outside secure/active contexts.
+    }
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1400);
   };
